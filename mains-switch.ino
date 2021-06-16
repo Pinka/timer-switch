@@ -11,45 +11,20 @@
 //
 //Pogu darbības
 //
-//- ieslēdz katlu
-//- izslēdz katlu
+//- ieslēdz/izslēdz katlu
 
-
-
-
-
-
-
-
-
-
-const int buttonUpPin = 4;
-const int buttonDownPin = 7;
-
+const int buttonPin = 4;
 const int relayPin =  9;
 const int ledPin =  13;
 
-int buttonUpState = 0;
-int previousButtonUpState = 0;
-int buttonDownState = 0;
-int previousButtonDownState = 0;
-
-const int MIN_TIMER_VALUE = 500;
-const int MAX_TIMER_VALUE = 30000;
+int buttonState = 0;
+int previousButtonState = 0;
 
 unsigned long timerOffMillis           = 0;
 unsigned long timerOffCurrentMillis    = 0;
 
 unsigned long timerOnMillis            = 0;
 unsigned long timerOnCurrentMillis     = 0;
-
-
-//- ieslēdz katlu un sagaida, kad sāk šņākt.
-//- izslēdz katlu, palaiž OFF taimeri.
-//- pēc 10s ieslēdz katlu, nofiksē OFF timeri un palaiž ON timeri.
-//- kad katls sāk šņākt, izslēdz katlu, nofiksējas ON timeris un OFF timeris sāk skaitīt laiku līdz ieslēgšanai.
-//- OFF timeris iztecējis, ieslēdzas katls un ON timeris sāk skaitīt laiku līdz izslēgšanai.
-//- ON timeris iztecējis, izslēdzas katls un ON/OFF process aiziet ciklā.
 
 const int STATE_INITIAL               = 0;
 const int STATE_FIRST_TIME_ON         = 1;
@@ -63,10 +38,9 @@ int state                             = STATE_INITIAL;
 
 void setup() {
   pinMode(relayPin, OUTPUT);
-  digitalWrite(relayPin, LOW);
+  pinMode(buttonPin, INPUT_PULLUP);
   
-  pinMode(buttonUpPin, INPUT_PULLUP);
-  pinMode(buttonDownPin, INPUT_PULLUP);
+  digitalWrite(relayPin, LOW);
 }
 
 void loop() {
@@ -139,17 +113,17 @@ void loop() {
 
 void buttonLoop() {
    
-  buttonUpState = !digitalRead(buttonUpPin);
-  buttonDownState = !digitalRead(buttonDownPin);
+  buttonState = !digitalRead(buttonPin);
 
-  digitalWrite(ledPin, buttonUpState || buttonDownState);
+  digitalWrite(ledPin, buttonState);
  
-  // Process button UP state
-  if (buttonUpState == HIGH) {
+  // Process button state
+  if (buttonState == HIGH) {
 
-      if(previousButtonUpState == LOW) {
-        previousButtonUpState = HIGH;
-        digitalWrite(relayPin, HIGH);
+      if(previousButtonState == LOW) {
+        previousButtonState = HIGH;
+
+        digitalWrite(relayPin, !digitalRead(relayPin));
 
         if(state == STATE_INITIAL) {
           state = STATE_FIRST_TIME_ON;
@@ -157,34 +131,21 @@ void buttonLoop() {
         else if(state == STATE_FIRST_TIME_OFF) {
           state = STATE_SECOND_TIME_ON;
         }
-        else {
+        else if ((state == STATE_TIME_OFF) || (state == STATE_SECOND_TIME_OFF)){
           state = STATE_TIME_ON;
+        }
+        else if(state == STATE_FIRST_TIME_ON) {
+          state = STATE_FIRST_TIME_OFF;
+        }
+        else if(state == STATE_SECOND_TIME_ON) {
+          state = STATE_SECOND_TIME_OFF;
+        }
+        else {
+          state = STATE_TIME_OFF;
         }
       }   
   }
   else {
-    previousButtonUpState = LOW;
-  }
-
-  // Process button DOWN state
-  if (buttonDownState == HIGH) {
-
-    if(previousButtonDownState == LOW) {
-      previousButtonDownState = HIGH;
-      digitalWrite(relayPin, LOW);
-
-      if(state == STATE_FIRST_TIME_ON) {
-        state = STATE_FIRST_TIME_OFF;
-      }
-      else if(state == STATE_SECOND_TIME_ON) {
-        state = STATE_SECOND_TIME_OFF;
-      }
-      else {
-        state = STATE_TIME_OFF;
-      }
-    }
-  }
-  else {
-    previousButtonDownState = LOW;
+    previousButtonState = LOW;
   }
 }
