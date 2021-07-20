@@ -138,7 +138,7 @@ void loop() {
 
     if(state == STATE_TIME_ON) {
       
-      globalTimeoutMillis = 3 * 60000;
+      globalTimeoutMillis = 120 * 60000;
       
       Serial.println("--------Set global timeout--------");
       Serial.print("globalTimeoutMillis="); Serial.print(globalTimeoutMillis); Serial.println();
