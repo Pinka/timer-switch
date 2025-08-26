@@ -202,7 +202,7 @@ unsigned long getAdjustedOffTime()
 void displayInitialScreen()
 {
   lcd.clear();
-  displayTimerPercentages();
+  displayTimers();
   lcd.setCursor(0, 1);
   lcd.print("Press to start");
 }
@@ -212,36 +212,36 @@ void updateDisplay(unsigned long currentMillis)
   if (!systemRunning)
   {
     // Show timer percentages and "Press to start"
-    displayTimerPercentages();
+    displayTimers();
     lcd.setCursor(0, 1);
     lcd.print("Press to start    ");
   }
   else
   {
     // Show timer percentages and current state with progress bar
-    displayTimerPercentages();
+    displayTimers();
     displayRunningState(currentMillis);
   }
 }
 
-void displayTimerPercentages()
+void displayTimers()
 {
-  int onPercent = (int)((currentOnTime / (float)baseOnTime) * 100);
-  int offPercent = (int)((currentOffTime / (float)baseOffTime) * 100);
+  int onSeconds = (int)(currentOnTime / 1000);
+  int offSeconds = (int)(currentOffTime / 1000);
 
   lcd.setCursor(0, 0);
   lcd.print("ON:");
-  if (onPercent < 100)
+  if (onSeconds < 100)
     lcd.print(" ");
-  lcd.print(onPercent);
-  lcd.print("%");
+  lcd.print(onSeconds);
+  lcd.print("s");
 
   lcd.setCursor(8, 0);
   lcd.print("OFF:");
-  if (offPercent < 100)
+  if (offSeconds < 100)
     lcd.print(" ");
-  lcd.print(offPercent);
-  lcd.print("%");
+  lcd.print(offSeconds);
+  lcd.print("s");
 }
 
 void displayRunningState(unsigned long currentMillis)
