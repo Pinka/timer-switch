@@ -299,7 +299,18 @@ void updateTimerValues()
 unsigned long getAdjustedOnTime()
 {
   int potOnValue = analogRead(potOnPin);
-  int mappedValue = map(potOnValue, potOnMin, potOnMax, 0, 100);
+  int mappedValue;
+
+  // Handle inverted ranges (max < min)
+  if (potOnMax < potOnMin)
+  {
+    mappedValue = map(potOnValue, potOnMax, potOnMin, 0, 100);
+  }
+  else
+  {
+    mappedValue = map(potOnValue, potOnMin, potOnMax, 0, 100);
+  }
+
   mappedValue = constrain(mappedValue, 0, 100);
   return mappedValue * 1000; // Convert to milliseconds
 }
@@ -307,7 +318,18 @@ unsigned long getAdjustedOnTime()
 unsigned long getAdjustedOffTime()
 {
   int potOffValue = analogRead(potOffPin);
-  int mappedValue = map(potOffValue, potOffMin, potOffMax, 0, 100);
+  int mappedValue;
+
+  // Handle inverted ranges (max < min)
+  if (potOffMax < potOffMin)
+  {
+    mappedValue = map(potOffValue, potOffMax, potOffMin, 0, 100);
+  }
+  else
+  {
+    mappedValue = map(potOffValue, potOffMin, potOffMax, 0, 100);
+  }
+
   mappedValue = constrain(mappedValue, 0, 100);
   return mappedValue * 1000; // Convert to milliseconds
 }
