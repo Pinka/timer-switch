@@ -177,12 +177,9 @@ void updateTimerValues()
   float onMultiplier = 0.2 + (potOnValue / 1023.0) * 4.8;
   float offMultiplier = 0.2 + (potOffValue / 1023.0) * 4.8;
 
-  // Update current timer values if system is not running
-  if (!systemRunning)
-  {
-    currentOnTime = constrain((unsigned long)(baseOnTime * onMultiplier), minTime, maxTime);
-    currentOffTime = constrain((unsigned long)(baseOffTime * offMultiplier), minTime, maxTime);
-  }
+  // Update current timer values
+  currentOnTime = constrain((unsigned long)(baseOnTime * onMultiplier), minTime, maxTime);
+  currentOffTime = constrain((unsigned long)(baseOffTime * offMultiplier), minTime, maxTime);
 }
 
 unsigned long getAdjustedOnTime()
