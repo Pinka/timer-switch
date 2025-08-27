@@ -213,31 +213,27 @@ void updateCalibrationDisplay()
     lcd.print("ON Min: ");
     lcd.print(potOnValue);
     lcd.print("    ");
-    lcd.setCursor(0, 1);
-    lcd.print("Press to confirm");
     break;
   case 1:
     lcd.print("ON Max: ");
     lcd.print(potOnValue);
     lcd.print("    ");
-    lcd.setCursor(0, 1);
-    lcd.print("Press to confirm");
     break;
   case 2:
     lcd.print("OFF Min: ");
     lcd.print(potOffValue);
     lcd.print("   ");
-    lcd.setCursor(0, 1);
-    lcd.print("Press to confirm");
     break;
   case 3:
     lcd.print("OFF Max: ");
     lcd.print(potOffValue);
     lcd.print("   ");
-    lcd.setCursor(0, 1);
-    lcd.print("Press to confirm");
     break;
   }
+
+  // Common second line for all calibration steps
+  lcd.setCursor(0, 1);
+  lcd.print("Press to confirm");
 }
 
 void finishCalibration()
@@ -373,8 +369,9 @@ void updateDisplay(unsigned long currentMillis)
   if (!systemRunning)
   {
     displayTimers();
+    // Display message on second line
     lcd.setCursor(0, 1);
-    lcd.print("Press to start    ");
+    lcd.print("Press to start");
   }
   else
   {
@@ -388,16 +385,18 @@ void displayTimers()
   int onSeconds = (int)(currentOnTime / 1000);
   int offSeconds = (int)(currentOffTime / 1000);
 
+  // Display ON timer with proper formatting (no clearing needed)
   lcd.setCursor(0, 0);
   lcd.print("ON:");
-  if (onSeconds < 100)
+  if (onSeconds < 10)
     lcd.print(" ");
   lcd.print(onSeconds);
   lcd.print("s");
 
+  // Display OFF timer with proper formatting
   lcd.setCursor(8, 0);
   lcd.print("OFF:");
-  if (offSeconds < 100)
+  if (offSeconds < 10)
     lcd.print(" ");
   lcd.print(offSeconds);
   lcd.print("s");
@@ -406,7 +405,6 @@ void displayTimers()
 void displayRunningState(unsigned long currentMillis)
 {
   lcd.setCursor(0, 1);
-
   if (relayState)
   {
     lcd.print("ON ");
@@ -429,10 +427,10 @@ void displayProgressBar(unsigned long currentMillis, unsigned long timerStart, u
     elapsed = timerDuration;
 
   int progress = (int)((elapsed * 100) / timerDuration);
-
-  lcd.setCursor(3, 1);
   int barLength = (progress * 12) / 100;
 
+  // Only update the progress bar area (positions 3-14)
+  lcd.setCursor(3, 1);
   for (int i = 0; i < 12; i++)
   {
     if (i < barLength)
