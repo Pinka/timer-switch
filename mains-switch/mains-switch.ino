@@ -1,13 +1,25 @@
 //
 // Timer Switch - Simplified Version
-// Calibrated potentiometer control for 0-100 second timers
+// Calibrated potentiometer control for 1-99 second timers
+// EEPROM storage for calibration values
 //
 
 #include <Wire.h>
 #include <hd44780.h>
 #include <hd44780ioClass/hd44780_I2Cexp.h>
+#include <EEPROM.h>
 
 hd44780_I2Cexp lcd;
+
+// EEPROM addresses for calibration storage
+const int EEPROM_CALIB_MAGIC = 0; // Magic number to verify calibration exists
+const int EEPROM_ON_MIN = 2;      // ON potentiometer minimum value (2 bytes)
+const int EEPROM_ON_MAX = 4;      // ON potentiometer maximum value (2 bytes)
+const int EEPROM_OFF_MIN = 6;     // OFF potentiometer minimum value (2 bytes)
+const int EEPROM_OFF_MAX = 8;     // OFF potentiometer maximum value (2 bytes)
+
+// Calibration validation constants
+const int CALIB_MAGIC_NUMBER = 0xAA55; // Magic number to identify valid calibration
 
 // Pin definitions
 const int buttonPin = 4;
@@ -68,9 +80,24 @@ void setup()
   }
   else
   {
-    // Normal startup
-    updateTimerValues();
-    displayInitialScreen();
+    // Check if calibration exists, if not force calibration
+    if (!loadCalibration())
+    {
+      Serial.println("No calibration found - forcing calibration");
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Calibration");
+      lcd.setCursor(0, 1);
+      lcd.print("Required!");
+      delay(2000);
+      startCalibration();
+    }
+    else
+    {
+      // Normal startup with valid calibration
+      updateTimerValues();
+      displayInitialScreen();
+    }
   }
 }
 
@@ -238,6 +265,9 @@ void updateCalibrationDisplay()
 
 void finishCalibration()
 {
+  // Save calibration values to EEPROM
+  saveCalibration();
+
   calibrationMode = false;
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -255,7 +285,7 @@ void finishCalibration()
 
   updateTimerValues();
   displayInitialScreen();
-  Serial.println("Calibration completed");
+  Serial.println("Calibration completed and saved to EEPROM");
 }
 
 void handleTimers(unsigned long currentMillis)
@@ -442,4 +472,73 @@ void displayProgressBar(unsigned long currentMillis, unsigned long timerStart, u
   if (remainingSeconds < 10)
     lcd.print(" ");
   lcd.print(remainingSeconds);
+}
+
+// EEPROM functions for calibration storage
+void saveCalibration()
+{
+  // Write magic number to verify calibration exists (2 bytes)
+  EEPROM.write(EEPROM_CALIB_MAGIC, (CALIB_MAGIC_NUMBER >> 8) & 0xFF);
+  EEPROM.write(EEPROM_CALIB_MAGIC + 1, CALIB_MAGIC_NUMBER & 0xFF);
+
+  // Write calibration values (2 bytes each for full 0-1023 range)
+  EEPROM.put(EEPROM_ON_MIN, potOnMin);
+  EEPROM.put(EEPROM_ON_MAX, potOnMax);
+  EEPROM.put(EEPROM_OFF_MIN, potOffMin);
+  EEPROM.put(EEPROM_OFF_MAX, potOffMax);
+
+  Serial.println("Calibration saved to EEPROM");
+  Serial.print("Magic bytes written: 0x");
+  Serial.print(EEPROM.read(EEPROM_CALIB_MAGIC), HEX);
+  Serial.print(" 0x");
+  Serial.println(EEPROM.read(EEPROM_CALIB_MAGIC + 1), HEX);
+  Serial.print("Saved values - ON: ");
+  Serial.print(potOnMin);
+  Serial.print("-");
+  Serial.print(potOnMax);
+  Serial.print(" OFF: ");
+  Serial.print(potOffMin);
+  Serial.print("-");
+  Serial.println(potOffMax);
+}
+
+bool loadCalibration()
+{
+  int magicNumber;
+
+  // Read magic number to verify calibration exists (2 bytes)
+  magicNumber = (EEPROM.read(EEPROM_CALIB_MAGIC) << 8) | EEPROM.read(EEPROM_CALIB_MAGIC + 1);
+
+  Serial.print("Read magic bytes: 0x");
+  Serial.print(EEPROM.read(EEPROM_CALIB_MAGIC), HEX);
+  Serial.print(" 0x");
+  Serial.println(EEPROM.read(EEPROM_CALIB_MAGIC + 1), HEX);
+  Serial.print("Read magic number: 0x");
+  Serial.println(magicNumber, HEX);
+  Serial.print("Expected magic number: 0x");
+  Serial.println(CALIB_MAGIC_NUMBER, HEX);
+
+  if (magicNumber != CALIB_MAGIC_NUMBER)
+  {
+    Serial.println("No valid calibration found in EEPROM");
+    return false;
+  }
+
+  // Read calibration values using EEPROM.get() (2 bytes each)
+  EEPROM.get(EEPROM_ON_MIN, potOnMin);
+  EEPROM.get(EEPROM_ON_MAX, potOnMax);
+  EEPROM.get(EEPROM_OFF_MIN, potOffMin);
+  EEPROM.get(EEPROM_OFF_MAX, potOffMax);
+
+  Serial.print("Read values - ON: ");
+  Serial.print(potOnMin);
+  Serial.print("-");
+  Serial.print(potOnMax);
+  Serial.print(" OFF: ");
+  Serial.print(potOffMin);
+  Serial.print("-");
+  Serial.println(potOffMax);
+
+  Serial.println("Calibration loaded from EEPROM successfully");
+  return true;
 }
