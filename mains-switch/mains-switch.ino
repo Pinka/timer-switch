@@ -19,7 +19,7 @@ const int EEPROM_OFF_MIN = 6;     // OFF potentiometer minimum value (2 bytes)
 const int EEPROM_OFF_MAX = 8;     // OFF potentiometer maximum value (2 bytes)
 
 // Calibration validation constants
-const int CALIB_MAGIC_NUMBER = 0xAA55; // Magic number to identify valid calibration
+const uint16_t CALIB_MAGIC_NUMBER = 0xAA55; // Magic number to identify valid calibration
 
 // Pin definitions
 const int buttonPin = 4;
@@ -478,8 +478,7 @@ void displayProgressBar(unsigned long currentMillis, unsigned long timerStart, u
 void saveCalibration()
 {
   // Write magic number to verify calibration exists (2 bytes)
-  EEPROM.write(EEPROM_CALIB_MAGIC, (CALIB_MAGIC_NUMBER >> 8) & 0xFF);
-  EEPROM.write(EEPROM_CALIB_MAGIC + 1, CALIB_MAGIC_NUMBER & 0xFF);
+  EEPROM.put(EEPROM_CALIB_MAGIC, CALIB_MAGIC_NUMBER);
 
   // Write calibration values (2 bytes each for full 0-1023 range)
   EEPROM.put(EEPROM_ON_MIN, potOnMin);
@@ -488,10 +487,8 @@ void saveCalibration()
   EEPROM.put(EEPROM_OFF_MAX, potOffMax);
 
   Serial.println("Calibration saved to EEPROM");
-  Serial.print("Magic bytes written: 0x");
-  Serial.print(EEPROM.read(EEPROM_CALIB_MAGIC), HEX);
-  Serial.print(" 0x");
-  Serial.println(EEPROM.read(EEPROM_CALIB_MAGIC + 1), HEX);
+  Serial.print("Magic number written: 0x");
+  Serial.println(CALIB_MAGIC_NUMBER, HEX);
   Serial.print("Saved values - ON: ");
   Serial.print(potOnMin);
   Serial.print("-");
@@ -504,15 +501,11 @@ void saveCalibration()
 
 bool loadCalibration()
 {
-  int magicNumber;
+  uint16_t magicNumber;
 
   // Read magic number to verify calibration exists (2 bytes)
-  magicNumber = (EEPROM.read(EEPROM_CALIB_MAGIC) << 8) | EEPROM.read(EEPROM_CALIB_MAGIC + 1);
+  EEPROM.get(EEPROM_CALIB_MAGIC, magicNumber);
 
-  Serial.print("Read magic bytes: 0x");
-  Serial.print(EEPROM.read(EEPROM_CALIB_MAGIC), HEX);
-  Serial.print(" 0x");
-  Serial.println(EEPROM.read(EEPROM_CALIB_MAGIC + 1), HEX);
   Serial.print("Read magic number: 0x");
   Serial.println(magicNumber, HEX);
   Serial.print("Expected magic number: 0x");
@@ -538,6 +531,13 @@ bool loadCalibration()
   Serial.print(potOffMin);
   Serial.print("-");
   Serial.println(potOffMax);
+
+  // Validate calibration values - only check for negative values
+  if (potOnMin < 0 || potOnMax < 0 || potOffMin < 0 || potOffMax < 0)
+  {
+    Serial.println("Invalid calibration values in EEPROM");
+    return false;
+  }
 
   Serial.println("Calibration loaded from EEPROM successfully");
   return true;
