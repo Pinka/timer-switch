@@ -408,12 +408,16 @@ void displayRunningState(unsigned long currentMillis)
   if (relayState)
   {
     lcd.print("ON ");
-    displayProgressBar(currentMillis, onTimerStart, currentOnTime);
+    // Use current timer value for accurate progress calculation
+    unsigned long currentTimerValue = getAdjustedOnTime();
+    displayProgressBar(currentMillis, onTimerStart, currentTimerValue);
   }
   else
   {
     lcd.print("OFF");
-    displayProgressBar(currentMillis, offTimerStart, currentOffTime);
+    // Use current timer value for accurate progress calculation
+    unsigned long currentTimerValue = getAdjustedOffTime();
+    displayProgressBar(currentMillis, offTimerStart, currentTimerValue);
   }
 }
 
@@ -429,7 +433,11 @@ void displayProgressBar(unsigned long currentMillis, unsigned long timerStart, u
   int progress = (int)((elapsed * 100) / timerDuration);
   int barLength = (progress * 12) / 100;
 
-  // Only update the progress bar area (positions 3-14)
+  // Calculate remaining time in seconds
+  unsigned long remaining = timerDuration - elapsed;
+  int remainingSeconds = (int)(remaining / 1000);
+
+  // Display progress bar and time
   lcd.setCursor(3, 1);
   for (int i = 0; i < 12; i++)
   {
@@ -442,4 +450,11 @@ void displayProgressBar(unsigned long currentMillis, unsigned long timerStart, u
       lcd.print(" ");
     }
   }
+
+  // Display remaining time at the end (positions 15-16)
+  // The progress bar can cover this when it reaches the end
+  lcd.setCursor(14, 1);
+  if (remainingSeconds < 10)
+    lcd.print(" ");
+  lcd.print(remainingSeconds);
 }
