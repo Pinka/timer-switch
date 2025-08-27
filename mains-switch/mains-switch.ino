@@ -408,16 +408,14 @@ void displayRunningState(unsigned long currentMillis)
   if (relayState)
   {
     lcd.print("ON ");
-    // Use current timer value for accurate progress calculation
-    unsigned long currentTimerValue = getAdjustedOnTime();
-    displayProgressBar(currentMillis, onTimerStart, currentTimerValue);
+    // Use the stored timer value to maintain consistency with display
+    displayProgressBar(currentMillis, onTimerStart, currentOnTime);
   }
   else
   {
     lcd.print("OFF");
-    // Use current timer value for accurate progress calculation
-    unsigned long currentTimerValue = getAdjustedOffTime();
-    displayProgressBar(currentMillis, offTimerStart, currentTimerValue);
+    // Use the stored timer value to maintain consistency with display
+    displayProgressBar(currentMillis, offTimerStart, currentOffTime);
   }
 }
 
