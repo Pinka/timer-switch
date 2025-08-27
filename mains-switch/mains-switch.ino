@@ -435,7 +435,8 @@ void displayProgressBar(unsigned long currentMillis, unsigned long timerStart, u
 
   // Calculate remaining time in seconds
   unsigned long remaining = timerDuration - elapsed;
-  int remainingSeconds = (int)(remaining / 1000);
+  // Adding one feels better when looking at the timer
+  int remainingSeconds = (int)(remaining / 1000) + 1;
 
   // Display progress bar and time
   lcd.setCursor(3, 1);
