@@ -307,15 +307,8 @@ unsigned long getAdjustedOnTime()
   int potOnValue = analogRead(potOnPin);
   int mappedValue;
 
-  // Handle inverted ranges (max < min)
-  if (potOnMax < potOnMin)
-  {
-    mappedValue = map(potOnValue, potOnMax, potOnMin, 0, 100);
-  }
-  else
-  {
-    mappedValue = map(potOnValue, potOnMin, potOnMax, 0, 100);
-  }
+  // Map potentiometer value to timer range (0-100 seconds)
+  mappedValue = map(potOnValue, potOnMin, potOnMax, 0, 100);
 
   // Ensure timer stays within 0-100 second range
   mappedValue = constrain(mappedValue, 0, 100);
@@ -334,15 +327,8 @@ unsigned long getAdjustedOffTime()
   int potOffValue = analogRead(potOffPin);
   int mappedValue;
 
-  // Handle inverted ranges (max < min)
-  if (potOffMax < potOffMin)
-  {
-    mappedValue = map(potOffValue, potOffMax, potOffMin, 0, 100);
-  }
-  else
-  {
-    mappedValue = map(potOffValue, potOffMin, potOffMax, 0, 100);
-  }
+  // Map potentiometer value to timer range (0-100 seconds)
+  mappedValue = map(potOffValue, potOffMin, potOffMax, 0, 100);
 
   // Ensure timer stays within 0-100 second range
   mappedValue = constrain(mappedValue, 0, 100);
