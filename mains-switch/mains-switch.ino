@@ -260,15 +260,15 @@ void finishCalibration()
 
 void handleTimers(unsigned long currentMillis)
 {
-  // Safety check: ensure timer values are within valid range (0-100 seconds)
-  if (currentOnTime > 100000)
-    currentOnTime = 100000; // Max 100 seconds
-  if (currentOffTime > 100000)
-    currentOffTime = 100000; // Max 100 seconds
-  if (currentOnTime < 0)
-    currentOnTime = 0;
-  if (currentOffTime < 0)
-    currentOffTime = 0;
+  // Safety check: ensure timer values are within valid range (1-99 seconds)
+  if (currentOnTime > 99000)
+    currentOnTime = 99000; // Max 99 seconds
+  if (currentOffTime > 99000)
+    currentOffTime = 99000; // Max 99 seconds
+  if (currentOnTime < 1000)
+    currentOnTime = 1000; // Min 1 second
+  if (currentOffTime < 1000)
+    currentOffTime = 1000; // Min 1 second
 
   if (relayState)
   {
@@ -307,17 +307,17 @@ unsigned long getAdjustedOnTime()
   int potOnValue = analogRead(potOnPin);
   int mappedValue;
 
-  // Map potentiometer value to timer range (0-100 seconds)
-  mappedValue = map(potOnValue, potOnMin, potOnMax, 0, 100);
+  // Map potentiometer value to timer range (1-99 seconds)
+  mappedValue = map(potOnValue, potOnMin, potOnMax, 1, 99);
 
-  // Ensure timer stays within 0-100 second range
-  mappedValue = constrain(mappedValue, 0, 100);
+  // Ensure timer stays within 1-99 second range
+  mappedValue = constrain(mappedValue, 1, 99);
 
   // Additional safety check to prevent overflow
-  if (mappedValue > 100)
-    mappedValue = 100;
-  if (mappedValue < 0)
-    mappedValue = 0;
+  if (mappedValue > 99)
+    mappedValue = 99;
+  if (mappedValue < 1)
+    mappedValue = 1;
 
   return (unsigned long)mappedValue * 1000; // Convert to milliseconds
 }
@@ -327,17 +327,17 @@ unsigned long getAdjustedOffTime()
   int potOffValue = analogRead(potOffPin);
   int mappedValue;
 
-  // Map potentiometer value to timer range (0-100 seconds)
-  mappedValue = map(potOffValue, potOffMin, potOffMax, 0, 100);
+  // Map potentiometer value to timer range (1-99 seconds)
+  mappedValue = map(potOffValue, potOffMin, potOffMax, 1, 99);
 
-  // Ensure timer stays within 0-100 second range
-  mappedValue = constrain(mappedValue, 0, 100);
+  // Ensure timer stays within 1-99 second range
+  mappedValue = constrain(mappedValue, 1, 99);
 
   // Additional safety check to prevent overflow
-  if (mappedValue > 100)
-    mappedValue = 100;
-  if (mappedValue < 0)
-    mappedValue = 0;
+  if (mappedValue > 99)
+    mappedValue = 99;
+  if (mappedValue < 1)
+    mappedValue = 1;
 
   return (unsigned long)mappedValue * 1000; // Convert to milliseconds
 }
