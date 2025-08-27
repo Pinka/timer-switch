@@ -264,6 +264,16 @@ void finishCalibration()
 
 void handleTimers(unsigned long currentMillis)
 {
+  // Safety check: ensure timer values are within valid range (0-100 seconds)
+  if (currentOnTime > 100000)
+    currentOnTime = 100000; // Max 100 seconds
+  if (currentOffTime > 100000)
+    currentOffTime = 100000; // Max 100 seconds
+  if (currentOnTime < 0)
+    currentOnTime = 0;
+  if (currentOffTime < 0)
+    currentOffTime = 0;
+
   if (relayState)
   {
     // Relay is ON - check if ON timer expired
@@ -311,8 +321,16 @@ unsigned long getAdjustedOnTime()
     mappedValue = map(potOnValue, potOnMin, potOnMax, 0, 100);
   }
 
+  // Ensure timer stays within 0-100 second range
   mappedValue = constrain(mappedValue, 0, 100);
-  return mappedValue * 1000; // Convert to milliseconds
+
+  // Additional safety check to prevent overflow
+  if (mappedValue > 100)
+    mappedValue = 100;
+  if (mappedValue < 0)
+    mappedValue = 0;
+
+  return (unsigned long)mappedValue * 1000; // Convert to milliseconds
 }
 
 unsigned long getAdjustedOffTime()
@@ -330,8 +348,16 @@ unsigned long getAdjustedOffTime()
     mappedValue = map(potOffValue, potOffMin, potOffMax, 0, 100);
   }
 
+  // Ensure timer stays within 0-100 second range
   mappedValue = constrain(mappedValue, 0, 100);
-  return mappedValue * 1000; // Convert to milliseconds
+
+  // Additional safety check to prevent overflow
+  if (mappedValue > 100)
+    mappedValue = 100;
+  if (mappedValue < 0)
+    mappedValue = 0;
+
+  return (unsigned long)mappedValue * 1000; // Convert to milliseconds
 }
 
 void displayInitialScreen()
