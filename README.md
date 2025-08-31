@@ -1,6 +1,6 @@
 # Timer Switch
 
-Arduino-based timer switch with potentiometer control and LCD display.
+Arduino-based dual-timer switch for controlling mains power with independent ON/OFF cycles.
 
 ## Hardware
 
@@ -9,34 +9,55 @@ Arduino-based timer switch with potentiometer control and LCD display.
 - Relay module
 - Push button
 - LED indicator
-- 10kΩ potentiometer
+- 2x 10kΩ potentiometers
 
 ## Connections
 
-- **Potentiometer**: A0 (shared for ON/OFF timing)
-- **Relay**: Pin 9
-- **Button**: Pin 4 (with pull-up)
-- **LED**: Pin 13
-- **LCD**: I2C pins
+| Component     | Pin | Description          |
+| ------------- | --- | -------------------- |
+| ON Timer Pot  | A0  | ON duration (1-99s)  |
+| OFF Timer Pot | A1  | OFF duration (1-99s) |
+| Relay         | 9   | Mains power control  |
+| Button        | 4   | Control input        |
+| LED           | 13  | Status indicator     |
+| LCD           | I2C | Display              |
 
 ## Features
 
-- **Calibrated Control**: Potentiometer calibration for accurate timing
-- **EEPROM Storage**: Calibration values saved permanently
-- **Timer Range**: 1-99 seconds adjustable via potentiometer
-- **Visual Display**: LCD shows current timers and progress
+- **Dual Timers**: Independent ON/OFF cycles (1-99 seconds each)
+- **Calibration**: Potentiometer calibration for accurate timing
+- **EEPROM Storage**: Settings saved permanently
+- **LCD Display**: Real-time timer and countdown display
 - **Manual Override**: Button toggles relay state
 
 ## Usage
 
-1. **First Time**: Hold button during startup to enter calibration mode
-2. **Calibration**: Follow LCD prompts to set potentiometer min/max values
-3. **Normal Operation**: Turn potentiometer to adjust timing (1-99 seconds)
-4. **Start**: Press button to begin timer cycle
-5. **Override**: Press button anytime to toggle relay state
+### Setup
+
+1. Hold button during startup to enter calibration
+2. Follow LCD prompts to calibrate both potentiometers
+3. System saves calibration automatically
+
+### Operation
+
+1. Turn potentiometers to set ON/OFF times
+2. Press button to start timer cycle
+3. Press button anytime to toggle relay
+4. LCD shows current settings and countdown
 
 ## Safety
 
-- **High Voltage**: Controls mains power through relay
-- **Proper Enclosure**: Use electrical enclosure for safety
-- **Correct Rating**: Ensure relay matches your voltage/current needs
+⚠️ **High Voltage Warning**: Controls mains power through relay.
+
+- Use proper electrical enclosure
+- Ensure relay matches voltage/current requirements
+- Test with low voltage first
+- Follow local electrical codes
+
+## Applications
+
+- Aquarium lighting cycles
+- Garden irrigation
+- HVAC fan control
+- Equipment timing
+- Home automation

@@ -26,7 +26,7 @@ const int buttonPin = 4;
 const int relayPin = 9;
 const int ledPin = 13;
 const int potOnPin = A0;
-const int potOffPin = A0;
+const int potOffPin = A1;
 
 // System state
 bool systemRunning = false;
